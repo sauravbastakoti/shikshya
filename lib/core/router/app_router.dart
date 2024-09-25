@@ -1,62 +1,59 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sikshya/service/dashboard_services.dart';
+import 'package:sikshya/user/Navigation_bar/Profile/profile_screen.dart';
+import 'package:sikshya/user/Navigation_bar/dashboard_screen.dart';
+import 'package:sikshya/Splash_screen/splash_screen.dart';
+import 'package:sikshya/features/login_screen.dart';
+import 'package:sikshya/responsive.dart/sacaffod_with_bottomnavbar.dart';
 
 class AppRouter {
-  static GoRouter router = GoRouter(routes: <RouteBase>[
-    // GoRoute(
-    //   path: '/',
-    //   builder: (BuildContext context, GoRouterState state) {
-    //     return const SplashScreen();
-    //   },
-    // ),
-    // GoRoute(
-    //   name: LoginScreen.routeName,
-    //   path: '/login',
-    //   builder: (BuildContext context, GoRouterState state) {
-    //     return const LoginScreen();
-    //   },
-    // ),
-    // GoRoute(
-    //   name: RegisterScreen.routeName,
-    //   path: '/register',
-    //   builder: (BuildContext context, GoRouterState state) {
-    //     return const RegisterScreen();
-    //   },
-    // ),
-    // ShellRoute(
-    //     builder: (context, state, child) {
-    //       return ScaffoldWithBottomNavbar(child: child);
-    //     },
-    //     routes: [
-    //       GoRoute(
-    //         name: DashboardScreen.routeName,
-    //         path: '/dashboard',
-    //         builder: (context, state) =>
-    //             DashboardScreen(pageController: PageController()),
-    //       ),
-    //       GoRoute(
-    //         name: Events.routeName,
-    //         path: '/events',
-    //         builder: (context, state) =>
-    //             Events(pageController: PageController()),
-    //       ),
-    //       GoRoute(
-    //         name: Notifications.routeName,
-    //         path: '/notifications',
-    //         builder: (context, state) =>
-    //             Notifications(pageController: PageController()),
-    //       ),
-    //       GoRoute(
-    //         name: Profile.routeName,
-    //         path: '/profile',
-    //         builder: (context, state) =>
-    //             Profile(pageController: PageController()),
-    //       ),
-    //       // GoRoute(
-    //       //   name: DashboardScreen.routeName,
-    //       //   path: '/dashboard',
-    //       //   builder: (context, state) =>
-    //       //       DashboardScreen(pageController: PageController()),
-    //       // ),
-    //     ])
-  ]);
+  static GoRouter router = GoRouter(
+    routes: <RouteBase>[
+      GoRoute(
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) {
+          return const SplashScreen();
+        },
+      ),
+      GoRoute(
+        name: LoginScreen.routeName,
+        path: '/login',
+        builder: (BuildContext context, GoRouterState state) {
+          return const LoginScreen();
+        },
+      ),
+      // Uncomment this if you want to add a registration page later
+      // GoRoute(
+      //   name: RegisterScreen.routeName,
+      //   path: '/register',
+      //   builder: (BuildContext context, GoRouterState state) {
+      //     return const RegisterScreen();
+      //   },
+      // ),
+      ShellRoute(
+        builder: (context, state, child) {
+          return ScaffoldWithBottomNavbar(
+            child: child, // This will be the content for the current tab
+          );
+        },
+        routes: [
+          GoRoute(
+            name: DashboardScreen.routeName,
+            path: '/dashboard',
+            builder: (context, state) {
+              return DashboardScreen(pageController: PageController());
+            },
+          ),
+          GoRoute(
+            name: ProfileScreen.routeName,
+            path: '/profile',
+            builder: (context, state) {
+              return const ProfileScreen();
+            },
+          ),
+        ],
+      ),
+    ],
+  );
 }

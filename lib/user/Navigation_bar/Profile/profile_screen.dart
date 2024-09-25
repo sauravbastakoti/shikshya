@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:sikshya/Navigation_bar/Profile/change_password.dart';
-import 'package:sikshya/Navigation_bar/Profile/personal_info.dart';
-import 'package:sikshya/Navigation_bar/Profile/terms_and_condition.dart';
-import 'package:sikshya/Navigation_bar/Profile/transcation.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:sikshya/core/router/app_router.dart';
+import 'package:sikshya/features/login_screen.dart';
+import 'package:sikshya/user/Navigation_bar/Profile/change_password.dart';
+import 'package:sikshya/user/Navigation_bar/Profile/personal_info.dart';
+import 'package:sikshya/user/Navigation_bar/Profile/terms_and_condition.dart';
+import 'package:sikshya/user/Navigation_bar/Profile/transcation.dart';
 
 class ProfileScreen extends StatefulWidget {
+  static String routeName = 'profile';
   const ProfileScreen({super.key});
 
   @override
@@ -14,10 +20,19 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isSwitched = false;
 
+  Future<void> _logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Clear the saved token
+    await prefs.remove(
+        'token'); // or `await prefs.clear();` if you want to clear all data
+    // Navigate to the login screen
+    context.goNamed(LoginScreen.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.lightGreenAccent, Colors.white],
           begin: Alignment.topCenter,
@@ -26,8 +41,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Profile"),
-          actions: [
+          title: const Text("Profile"),
+          actions: const [
             Padding(
               padding: EdgeInsets.only(right: 20),
               child: Icon(Icons.settings),
@@ -40,10 +55,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
         body: Column(
           children: [
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(10.0),
               child: Column(
-                children: const [
+                children: [
                   CircleAvatar(
                     radius: 60,
                     backgroundImage: NetworkImage(
@@ -74,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PersonalInfo(),
+                          builder: (context) => const PersonalInfo(),
                         ),
                       );
                     },
@@ -86,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChangePassword(),
+                          builder: (context) => const ChangePassword(),
                         ),
                       );
                     },
@@ -103,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Transaction_history(),
+                          builder: (context) => const Transaction_history(),
                         ),
                       );
                     },
@@ -120,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TermsAndCondition(),
+                          builder: (context) => const TermsAndCondition(),
                         ),
                       );
                     },
@@ -132,10 +147,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PersonalInfo(),
+                          builder: (context) => const PersonalInfo(),
                         ),
                       );
                     },
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: TextButton(
+                        onPressed: _logout, // Call the logout function
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 62, 151, 215),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: Text(
+                          'Log Out',
+                          style: GoogleFonts.getFont(
+                            'Roboto Condensed',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
+                            color: const Color.fromARGB(255, 248, 248, 248),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

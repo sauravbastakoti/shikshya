@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sikshya/models/post.dart';
 import 'package:sikshya/service/dashboard_services.dart';
-import 'package:sikshya/website/website_design.dart';
+import 'package:sikshya/user/website/website_design.dart';
 
 class MyCourse extends StatefulWidget {
   const MyCourse({super.key});
@@ -17,21 +17,20 @@ class _MyCourseState extends State<MyCourse> {
   @override
   void initState() {
     super.initState();
-    getData();
   }
 
-  getData() async {
-    setState(() {
-      isLoaded = false;
-    });
+  // getData() async {
+  //   setState(() {
+  //     isLoaded = false;
+  //   });
 
-    posts = await RemoteServices().getPost();
-    if (posts != null) {
-      setState(() {
-        isLoaded = true;
-      });
-    }
-  }
+  //   posts = await RemoteServices().getPost();
+  //   if (posts != null) {
+  //     setState(() {
+  //       isLoaded = true;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +45,7 @@ class _MyCourseState extends State<MyCourse> {
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: GestureDetector(
-              onTap: () {
-                getData();
-              },
+              onTap: () {},
               child: const Icon(Icons.refresh_sharp),
             ),
           ),
@@ -64,7 +61,7 @@ class _MyCourseState extends State<MyCourse> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => WebsiteScreen(post: posts![index]),
+                    builder: (context) => const WebsiteScreen(),
                   ),
                 );
               },

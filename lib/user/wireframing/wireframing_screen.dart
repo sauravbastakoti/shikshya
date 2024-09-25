@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sikshya/wireframing/overview.dart';
+import 'package:sikshya/user/wireframing/overview.dart';
 
 class WireframingScreen extends StatefulWidget {
   const WireframingScreen({super.key});
@@ -28,11 +28,11 @@ class _WireframingScreenState extends State<WireframingScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("WireFraming"),
+        title: const Text("WireFraming"),
       ),
       body: Column(
         children: [
-          Container(
+          SizedBox(
             height: 200,
             width: double.infinity,
             child: Image.network(
@@ -42,7 +42,7 @@ class _WireframingScreenState extends State<WireframingScreen>
           ),
           TabBar(
             controller: _tabController,
-            tabs: [
+            tabs: const [
               Tab(text: "Overview"),
               Tab(text: "Lesson"),
               Tab(text: "Reviews"),
@@ -54,7 +54,7 @@ class _WireframingScreenState extends State<WireframingScreen>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
+              children: const [
                 OverviewWireframing(),
                 Center(child: Text("Lesson Content")),
                 Center(child: Text("Reviews Content")),

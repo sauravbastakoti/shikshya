@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-
-import 'package:sikshya/Navigation_bar/courses.dart';
-import 'package:sikshya/Navigation_bar/dashboard_screen.dart';
-import 'package:sikshya/Navigation_bar/Profile/profile_screen.dart';
+import 'package:get/get.dart'; // For navigation to chat screen
+import 'package:go_router/go_router.dart';
+import 'package:sikshya/user/Navigation_bar/Profile/profile_screen.dart';
+import 'package:sikshya/user/Navigation_bar/dashboard_screen.dart'; // For GoRouter navigation
 
 class ScaffoldWithBottomNavbar extends StatefulWidget {
-  final int initialIndex;
-
-  ScaffoldWithBottomNavbar({this.initialIndex = 0});
+  const ScaffoldWithBottomNavbar({super.key, required this.child});
+  final Widget child;
 
   @override
   _ScaffoldWithBottomNavbarState createState() =>
@@ -16,64 +15,69 @@ class ScaffoldWithBottomNavbar extends StatefulWidget {
 
 class _ScaffoldWithBottomNavbarState extends State<ScaffoldWithBottomNavbar> {
   int _selectedIndex = 0;
-  late PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = widget.initialIndex;
-    _pageController = PageController(initialPage: _selectedIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    _pageController.jumpToPage(index);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        physics: NeverScrollableScrollPhysics(),
-        children: [
-          DashboardScreen(
-            pageController: _pageController,
-          ),
-          CoursesNav(),
-          ProfileScreen(),
-          //DashboardScreen(pageController: _pageController),
-          // Categories(pageController: _pageController),
-          // PlantScanner(pageController: _pageController),
-          // Profile(pageController: _pageController),
-        ],
-      ),
+      body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF1B9527),
+        unselectedItemColor: const Color(0xFF706060),
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book_outlined),
-            label: 'Courses',
+            icon: Icon(Icons.category),
+            label: 'Courses', // Updated: Courses instead of Categories
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: Icon(Icons.qr_code_scanner),
+            label:
+                'Scan', // You can remove this or keep it if you have a scanner functionality
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          _onItemTapped(context, index);
+        },
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Get.to(const ChatRoom()); // Navigates to ChatScreen using GetX
+      //   },
+      //   backgroundColor: Colors.blue,
+      //   child: const Icon(Icons.chat),
+      // ),
     );
+  }
+
+  // Handles navigation when a BottomNavigationBar item is tapped
+  void _onItemTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.goNamed(DashboardScreen.routeName); // Navigates to Dashboard
+        break;
+      case 1:
+        context.goNamed(
+            DashboardScreen.routeName); // Navigates to Courses (Updated)
+        break;
+      // You can keep or remove Scan if needed
+
+      case 3:
+        context.goNamed(ProfileScreen.routeName); // Navigates to Profile
+        break;
+      default:
+        break;
+    }
   }
 }
