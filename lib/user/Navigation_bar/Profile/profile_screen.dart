@@ -11,7 +11,8 @@ import 'package:sikshya/user/Navigation_bar/Profile/transcation.dart';
 
 class ProfileScreen extends StatefulWidget {
   static String routeName = 'profile';
-  const ProfileScreen({super.key});
+  final PageController pageController;
+  const ProfileScreen({super.key, required this.pageController});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();

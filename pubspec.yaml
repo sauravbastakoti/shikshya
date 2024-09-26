@@ -50,6 +50,7 @@ dependencies:
   equatable: ^2.0.5
   google_fonts: ^6.2.1
   flutter_pannable_rating_bar: ^2.7.2+1
+  chewie: ^1.8.5
 
 dev_dependencies:
   flutter_test:

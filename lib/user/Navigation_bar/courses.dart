@@ -228,7 +228,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const WebsiteScreen(
+                                  builder: (context) => const LessonWebsite(
                                       //    post: filteredCourses![index])),
                                       ),
                                 ));

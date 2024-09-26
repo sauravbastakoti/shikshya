@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // For navigation to chat screen
 import 'package:go_router/go_router.dart';
 import 'package:sikshya/user/Navigation_bar/Profile/profile_screen.dart';
-import 'package:sikshya/user/Navigation_bar/dashboard_screen.dart'; // For GoRouter navigation
+import 'package:sikshya/user/Navigation_bar/dashboard_screen.dart';
+import 'package:sikshya/user/my_course.dart'; // For GoRouter navigation
 
 class ScaffoldWithBottomNavbar extends StatefulWidget {
   const ScaffoldWithBottomNavbar({super.key, required this.child});
@@ -32,12 +33,7 @@ class _ScaffoldWithBottomNavbarState extends State<ScaffoldWithBottomNavbar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category),
-            label: 'Courses', // Updated: Courses instead of Categories
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner),
-            label:
-                'Scan', // You can remove this or keep it if you have a scanner functionality
+            label: 'My Courses', // Updated: Courses instead of Categories
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -51,12 +47,7 @@ class _ScaffoldWithBottomNavbarState extends State<ScaffoldWithBottomNavbar> {
           _onItemTapped(context, index);
         },
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Get.to(const ChatRoom()); // Navigates to ChatScreen using GetX
-      //   },
-      //   backgroundColor: Colors.blue,
-      //   child: const Icon(Icons.chat),
+
       // ),
     );
   }
@@ -68,8 +59,7 @@ class _ScaffoldWithBottomNavbarState extends State<ScaffoldWithBottomNavbar> {
         context.goNamed(DashboardScreen.routeName); // Navigates to Dashboard
         break;
       case 1:
-        context.goNamed(
-            DashboardScreen.routeName); // Navigates to Courses (Updated)
+        context.goNamed(MyCourse.routeName); // Navigates to Courses (Updated)
         break;
       // You can keep or remove Scan if needed
 

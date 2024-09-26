@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sikshya/models/post.dart';
-import 'package:sikshya/service/dashboard_services.dart';
+
 import 'package:sikshya/user/website/website_design.dart';
 
 class MyCourse extends StatefulWidget {
-  const MyCourse({super.key});
+  static String routeName = '/mycourses';
+  final PageController pageController;
+  const MyCourse({super.key, required this.pageController});
 
   @override
   State<MyCourse> createState() => _MyCourseState();
@@ -61,7 +63,7 @@ class _MyCourseState extends State<MyCourse> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const WebsiteScreen(),
+                    builder: (context) => const LessonWebsite(),
                   ),
                 );
               },

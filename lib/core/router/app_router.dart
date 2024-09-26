@@ -6,6 +6,7 @@ import 'package:sikshya/user/Navigation_bar/dashboard_screen.dart';
 import 'package:sikshya/Splash_screen/splash_screen.dart';
 import 'package:sikshya/features/login_screen.dart';
 import 'package:sikshya/responsive.dart/sacaffod_with_bottomnavbar.dart';
+import 'package:sikshya/user/my_course.dart';
 
 class AppRouter {
   static GoRouter router = GoRouter(
@@ -46,10 +47,19 @@ class AppRouter {
             },
           ),
           GoRoute(
+            name: MyCourse.routeName,
+            path: '/mycourses',
+            builder: (context, state) {
+              return MyCourse(pageController: PageController());
+            },
+          ),
+          GoRoute(
             name: ProfileScreen.routeName,
             path: '/profile',
             builder: (context, state) {
-              return const ProfileScreen();
+              return ProfileScreen(
+                pageController: PageController(),
+              );
             },
           ),
         ],
