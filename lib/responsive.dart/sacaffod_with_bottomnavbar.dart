@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart'; // For navigation to chat screen
 import 'package:go_router/go_router.dart';
+import 'package:sikshya/core/shared_prefences/locator.dart';
+import 'package:sikshya/cubit/buy_courses/buy_courses_cubit.dart';
+import 'package:sikshya/services/api_services.dart';
 import 'package:sikshya/user/Navigation_bar/Profile/profile_screen.dart';
 import 'package:sikshya/user/Navigation_bar/dashboard_screen.dart';
 import 'package:sikshya/user/my_course.dart'; // For GoRouter navigation
@@ -19,36 +23,39 @@ class _ScaffoldWithBottomNavbarState extends State<ScaffoldWithBottomNavbar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF1B9527),
-        unselectedItemColor: const Color(0xFF706060),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'My Courses', // Updated: Courses instead of Categories
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          _onItemTapped(context, index);
-        },
-      ),
+    return BlocProvider(
+      create: (context) => BuyCoursesCubit(locator.get<ApiService>()),
+      child: Scaffold(
+        body: widget.child,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: const Color(0xFF1B9527),
+          unselectedItemColor: const Color(0xFF706060),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: 'My Courses', // Updated: Courses instead of Categories
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+            _onItemTapped(context, index);
+          },
+        ),
 
-      // ),
+        // ),
+      ),
     );
   }
 
@@ -61,9 +68,8 @@ class _ScaffoldWithBottomNavbarState extends State<ScaffoldWithBottomNavbar> {
       case 1:
         context.goNamed(MyCourse.routeName); // Navigates to Courses (Updated)
         break;
-      // You can keep or remove Scan if needed
 
-      case 3:
+      case 2:
         context.goNamed(ProfileScreen.routeName); // Navigates to Profile
         break;
       default:

@@ -229,8 +229,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const LessonWebsite(
-                                      //    post: filteredCourses![index])),
-                                      ),
+                                    id: 1,
+                                    //    post: filteredCourses![index])),
+                                  ),
                                 ));
                           },
                           child: Card(

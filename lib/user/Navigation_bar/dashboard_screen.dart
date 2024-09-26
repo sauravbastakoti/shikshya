@@ -601,7 +601,7 @@ import 'package:sikshya/utils/api_string.dart';
 // Course Model
 class Course {
   final int id;
-  final int teacher;
+  final String teacher;
   final String title;
   final String description;
   final String thumbnail;
@@ -622,7 +622,7 @@ class Course {
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
       id: json['id'],
-      teacher: json['teacher'],
+      teacher: json['teacher_username'],
       title: json['title'],
       description: json['description'],
       thumbnail: json['thumbnail_url'],
@@ -760,7 +760,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Hi, Yujan",
+                      "Hi, User",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -768,7 +768,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     Text(
-                      "Good Morning",
+                      "Welcome",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -779,11 +779,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             GestureDetector(
-              onTap: () {
-                // Navigate to notifications
-              },
+              onTap: () {},
               child: const Icon(
-                Icons.notifications,
+                Icons.business_center_sharp,
                 color: Colors.white,
                 size: 30,
               ),
@@ -845,7 +843,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const WebsiteScreen(),
+                              builder: (context) => WebsiteScreen(
+                                id: filteredCourses![index].id,
+                              ),
                             ),
                           );
                         },

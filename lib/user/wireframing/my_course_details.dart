@@ -12,15 +12,15 @@ import 'package:sikshya/utils/api_string.dart';
 import 'dart:convert';
 import 'package:video_player/video_player.dart'; // Import video_player package
 
-class WebsiteScreen extends StatefulWidget {
+class MyCourseDetails extends StatefulWidget {
   final int id;
-  const WebsiteScreen({super.key, required this.id});
+  const MyCourseDetails({super.key, required this.id});
 
   @override
-  State<WebsiteScreen> createState() => _WebsiteScreenState();
+  State<MyCourseDetails> createState() => _MyCourseDetailsState();
 }
 
-class _WebsiteScreenState extends State<WebsiteScreen>
+class _MyCourseDetailsState extends State<MyCourseDetails>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -101,7 +101,7 @@ class _OverviewWebsiteState extends State<OverviewWebsite> {
 
   Future<void> fetchOverviewData() async {
     // API endpoint for the overview data
-    String apiUrl = '${ApiString.baseUrl}courses/${widget.id}/';
+    String apiUrl = '${ApiString.baseUrl}paidcoursesdetail/${widget.id}/';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -255,32 +255,32 @@ class _OverviewWebsiteState extends State<OverviewWebsite> {
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
-                  Builder(builder: (context) {
-                    return BlocListener<BuyCoursesCubit, BuyCoursesState>(
-                      listener: (context, state) {
-                        if (state.status == BuyCoursesStatus.initial) {
-                        } else if (state.status == BuyCoursesStatus.success) {
-                          processPayment();
-                        }
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        width: 400,
-                        child: MaterialButton(
-                          color: Colors.lightBlue,
-                          onPressed: () {
-                            context
-                                .read<BuyCoursesCubit>()
-                                .checkUser(widget.id);
-                          },
-                          child: const Text(
-                            "Get Enrolled",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
+                  // Builder(builder: (context) {
+                  //   return BlocListener<BuyCoursesCubit, BuyCoursesState>(
+                  //     listener: (context, state) {
+                  //       if (state.status == BuyCoursesStatus.initial) {
+                  //       } else if (state.status == BuyCoursesStatus.success) {
+                  //         processPayment();
+                  //       }
+                  //     },
+                  //     child: SizedBox(
+                  //       height: 50,
+                  //       width: 400,
+                  //       child: MaterialButton(
+                  //         color: Colors.lightBlue,
+                  //         onPressed: () {
+                  //           context
+                  //               .read<BuyCoursesCubit>()
+                  //               .checkUser(widget.id);
+                  //         },
+                  //         child: const Text(
+                  //           "Get Enrolled",
+                  //           style: TextStyle(fontSize: 20),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   );
+                  // }),
                   const SizedBox(height: 10),
                   const Divider(),
                   const Text(
@@ -349,11 +349,17 @@ class _LessonWebsiteState extends State<LessonWebsite> {
   }
 
   Future<void> fetchChapters() async {
+    final token = locator.get<SharedPreferencesService>().token;
     // API endpoint for the course data
-    String apiUrl = '${ApiString.baseUrl}courses/${widget.id}/';
+    String apiUrl = '${ApiString.baseUrl}paidcoursesdetail/${widget.id}/';
 
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -415,22 +421,22 @@ class _LessonWebsiteState extends State<LessonWebsite> {
                             ListTile(
                               title: Text(chapter['description']),
                             ),
-                            // ...chapter['videos'].map<Widget>((video) {
-                            //   return ListTile(
-                            //     leading: const Icon(Icons.play_circle),
-                            //     title: Text(video['title']),
-                            //     onTap: () {
-                            //       Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //           builder: (context) => VideoPlayerScreen(
-                            //             videoUrl: video['full_video_url'],
-                            //           ),
-                            //         ),
-                            //       );
-                            //     },
-                            //   );
-                            // }).toList(),
+                            ...chapter['videos'].map<Widget>((video) {
+                              return ListTile(
+                                leading: const Icon(Icons.play_circle),
+                                title: Text(video['title']),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VideoPlayerScreen(
+                                        videoUrl: video['full_video_url'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }).toList(),
                           ],
                         ),
                         isExpanded: chapter['isExpanded'] ?? false,
@@ -444,112 +450,226 @@ class _LessonWebsiteState extends State<LessonWebsite> {
   }
 }
 
-// class VideoPlayerScreen extends StatefulWidget {
-//   final String videoUrl;
-//   const VideoPlayerScreen({super.key, required this.videoUrl});
+class VideoPlayerScreen extends StatefulWidget {
+  final String videoUrl;
+  const VideoPlayerScreen({super.key, required this.videoUrl});
 
-//   @override
-//   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
-// }
+  @override
+  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
+}
 
-// class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-//   late VideoPlayerController _controller;
-//   bool _isPlaying = false;
-//   bool _hasError = false;
+class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+  bool _hasError = false;
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     loadVideo();
-//   }
+  @override
+  void initState() {
+    super.initState();
+    loadVideo();
+  }
 
-//   Future<void> loadVideo() async {
-//     try {
-//       print('Video URL: ${widget.videoUrl}');
+  Future<void> loadVideo() async {
+    try {
+      print('Video URL: ${widget.videoUrl}');
 
-//       if (widget.videoUrl.isNotEmpty) {
-//         _controller =
-//             VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
-//               ..initialize().then((_) {
-//                 setState(() {
-//                   _hasError =
-//                       false; // Reset error state if initialized successfully
-//                 });
-//                 _controller.play();
-//                 _isPlaying = true;
-//               }).catchError((error) {
-//                 setState(() {
-//                   _hasError =
-//                       true; // Set error state if video initialization fails
-//                 });
-//                 print("Error initializing video: $error");
-//               });
-//       } else {
-//         setState(() {
-//           _hasError = true;
-//         });
-//         print("Invalid video URL");
-//       }
-//     } catch (e) {
-//       setState(() {
-//         _hasError = true;
-//       });
-//       print("Error loading video: $e");
-//     }
-//   }
+      if (widget.videoUrl.isNotEmpty) {
+        _controller = VideoPlayerController.networkUrl(Uri.parse(
+            'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'))
+          ..initialize().then((_) {
+            setState(() {
+              _hasError =
+                  false; // Reset error state if initialized successfully
+            });
+            _controller.play();
+            _isPlaying = true;
+          }).catchError((error) {
+            setState(() {
+              _hasError = true; // Set error state if video initialization fails
+            });
+            print("Error initializing video: $error");
+          });
+      } else {
+        setState(() {
+          _hasError = true;
+        });
+        print("Invalid video URL");
+      }
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+      });
+      print("Error loading video: $e");
+    }
+  }
 
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Video Player'),
-//       ),
-//       body: Center(
-//           child: _hasError
-//               ? const Text('Failed to load video') // Show error message
-//               : _controller.value.isInitialized
-//                   ? Column(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//                         AspectRatio(
-//                           aspectRatio: _controller.value.aspectRatio,
-//                           child: VideoPlayer(_controller),
-//                         ),
-//                         const SizedBox(height: 20),
-//                         IconButton(
-//                           icon: Icon(
-//                             _isPlaying ? Icons.pause : Icons.play_arrow,
-//                           ),
-//                           onPressed: () {
-//                             setState(() {
-//                               if (_isPlaying) {
-//                                 _controller.pause();
-//                               } else {
-//                                 _controller.play();
-//                               }
-//                               _isPlaying = !_isPlaying;
-//                             });
-//                           },
-//                         ),
-//                       ],
-//                     )
-//                   : const CircularProgressIndicator()),
-//     );
-//   }
-// }
-
-class ReviewWebsite extends StatelessWidget {
-  const ReviewWebsite({super.key});
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Reviews"));
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Video Player'),
+      ),
+      body: Center(
+          child: _hasError
+              ? const Text('Failed to load video') // Show error message
+              : _controller.value.isInitialized
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: _controller.value.aspectRatio,
+                          child: VideoPlayer(_controller),
+                        ),
+                        const SizedBox(height: 20),
+                        IconButton(
+                          icon: Icon(
+                            _isPlaying ? Icons.pause : Icons.play_arrow,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (_isPlaying) {
+                                _controller.pause();
+                              } else {
+                                _controller.play();
+                              }
+                              _isPlaying = !_isPlaying;
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  : const CircularProgressIndicator()),
+    );
+  }
+}
+
+class ReviewWebsite extends StatefulWidget {
+  const ReviewWebsite({super.key});
+
+  @override
+  _ReviewWebsiteState createState() => _ReviewWebsiteState();
+}
+
+class _ReviewWebsiteState extends State<ReviewWebsite> {
+  final List<Map<String, dynamic>> _reviews = [
+    {
+      'name': 'John Doe',
+      'rating': 4.0,
+      'comment': 'Great service!',
+    },
+    {
+      'name': 'Jane Smith',
+      'rating': 5.0,
+      'comment': 'Loved it!',
+    },
+  ];
+
+  double _currentRating = 0;
+  final TextEditingController _commentController = TextEditingController();
+
+  void _submitReview() {
+    if (_currentRating > 0 && _commentController.text.isNotEmpty) {
+      setState(() {
+        _reviews.add({
+          'name': 'Anonymous', // Static user name for demo purposes
+          'rating': _currentRating,
+          'comment': _commentController.text,
+        });
+        _currentRating = 0;
+        _commentController.clear();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Rate our service:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              _buildRatingStars(),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _commentController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter your comment',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _submitReview,
+                child: const Text('Submit Review'),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'User Reviews:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              ListView.builder(
+                shrinkWrap: true,
+                physics:
+                    const NeverScrollableScrollPhysics(), // Disable scrolling for ListView
+                itemCount: _reviews.length,
+                itemBuilder: (context, index) {
+                  final review = _reviews[index];
+                  return ListTile(
+                    title: Text(review['name']),
+                    subtitle: Text(review['comment']),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        5,
+                        (starIndex) => Icon(
+                          starIndex < review['rating']
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRatingStars() {
+    return Row(
+      children: List.generate(5, (index) {
+        return IconButton(
+          icon: Icon(
+            index < _currentRating ? Icons.star : Icons.star_border,
+            color: Colors.amber,
+          ),
+          onPressed: () {
+            setState(() {
+              _currentRating = index + 1.0;
+            });
+          },
+        );
+      }),
+    );
   }
 }
 
