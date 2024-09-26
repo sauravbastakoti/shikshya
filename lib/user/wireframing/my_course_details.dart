@@ -65,7 +65,9 @@ class _MyCourseDetailsState extends State<MyCourseDetails>
                 LessonWebsite(
                   id: widget.id,
                 ),
-                const ReviewWebsite(),
+                ReviewWebsite(
+                  id: widget.id,
+                ),
               ],
             ),
           ),
@@ -550,25 +552,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 }
 
 class ReviewWebsite extends StatefulWidget {
-  const ReviewWebsite({super.key});
+  final int id;
+  const ReviewWebsite({super.key, required this.id});
 
   @override
   _ReviewWebsiteState createState() => _ReviewWebsiteState();
 }
 
 class _ReviewWebsiteState extends State<ReviewWebsite> {
-  final List<Map<String, dynamic>> _reviews = [
-    {
-      'name': 'John Doe',
-      'rating': 4.0,
-      'comment': 'Great service!',
-    },
-    {
-      'name': 'Jane Smith',
-      'rating': 5.0,
-      'comment': 'Loved it!',
-    },
-  ];
+  List<dynamic> _reviews = [];
+  double _averageRating = 0.0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReviewsAndRatings();
+  }
 
   double _currentRating = 0;
   final TextEditingController _commentController = TextEditingController();
@@ -587,70 +587,103 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
     }
   }
 
+  Future<void> _fetchReviewsAndRatings() async {
+    final token = locator.get<SharedPreferencesService>().token;
+    try {
+      // Fetch reviews (Expecting a List response)
+      final reviewsResponse = await http.get(
+        Uri.parse('${ApiString.baseUrl}reviews/${widget.id}/'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      // Decode response as a List
+      final List<dynamic> reviewsData = jsonDecode(reviewsResponse.body);
+
+      // Fetch average rating (Expecting a Map response)
+      final ratingResponse = await http.get(
+        Uri.parse('${ApiString.baseUrl}ratings/${widget.id}/'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      final Map<String, dynamic> ratingData = jsonDecode(ratingResponse.body);
+      double averageRating = ratingData['average_rating'] ?? 0.0;
+
+      setState(() {
+        _reviews = reviewsData; // List of reviews
+        _averageRating = averageRating; // Average rating value
+        _isLoading = false;
+      });
+    } catch (e) {
+      // Handle errors
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching data: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Rate our service:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              _buildRatingStars(),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _commentController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter your comment',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _submitReview,
-                child: const Text('Submit Review'),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'User Reviews:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                physics:
-                    const NeverScrollableScrollPhysics(), // Disable scrolling for ListView
-                itemCount: _reviews.length,
-                itemBuilder: (context, index) {
-                  final review = _reviews[index];
-                  return ListTile(
-                    title: Text(review['name']),
-                    subtitle: Text(review['comment']),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(
-                        5,
-                        (starIndex) => Icon(
-                          starIndex < review['rating']
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: Colors.amber,
-                        ),
-                      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Rate our service:',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                  );
-                },
+                    const SizedBox(height: 10),
+                    _buildAverageRatingStars(),
+                    const SizedBox(height: 10),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    _buildRatingStars(),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _commentController,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter your comment',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _submitReview,
+                      child: const Text('Submit Review'),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'User Reviews:',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildReviewList(),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
+    );
+  }
+
+  Widget _buildAverageRatingStars() {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < _averageRating ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+        );
+      }),
     );
   }
 
@@ -669,6 +702,21 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
           },
         );
       }),
+    );
+  }
+
+  Widget _buildReviewList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _reviews.length,
+      itemBuilder: (context, index) {
+        final review = _reviews[index];
+        return ListTile(
+          title: Text(review['student_name']),
+          subtitle: Text(review['comment']),
+        );
+      },
     );
   }
 }

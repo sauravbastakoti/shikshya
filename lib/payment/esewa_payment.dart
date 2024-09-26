@@ -21,9 +21,6 @@ class _EsewaPaymentScreenState extends State<EsewaPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('eSewa Payment'),
-      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

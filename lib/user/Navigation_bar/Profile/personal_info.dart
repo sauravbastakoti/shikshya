@@ -96,9 +96,9 @@ class _PersonalInfoState extends State<PersonalInfo> {
               keyboardType: TextInputType.datetime,
               onFieldSubmitted: (value) {
                 try {
-                  final DateTime? typedDate =
+                  final DateTime typedDate =
                       DateFormat('yyyy-MM-dd').parseStrict(value);
-                  if (typedDate != null && typedDate.isBefore(DateTime.now())) {
+                  if (typedDate.isBefore(DateTime.now())) {
                     setState(() {
                       selectedDate = typedDate;
                     });

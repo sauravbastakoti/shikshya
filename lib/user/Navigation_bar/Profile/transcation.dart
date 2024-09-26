@@ -12,7 +12,7 @@ class _Transaction_historyState extends State<Transaction_history> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Transaction History"),
+        title: const Text("Transaction History"),
       ),
     );
   }

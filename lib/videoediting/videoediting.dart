@@ -12,7 +12,7 @@ class _VideoeditingState extends State<Videoediting> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Video Editing"),
+        title: const Text("Video Editing"),
       ),
     );
   }

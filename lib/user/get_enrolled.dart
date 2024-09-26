@@ -15,7 +15,7 @@ class _GetEnrolledState extends State<GetEnrolled> {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30.0),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Colors.lightBlueAccent, Colors.white],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -24,25 +24,25 @@ class _GetEnrolledState extends State<GetEnrolled> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
+          const Text(
             "Overview",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Text(
+          const Text(
             "Course Name: Graphics Design",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Container(
             height: 100,
             width: double.infinity,
-            decoration: BoxDecoration(color: Colors.white),
-            child: Column(
+            decoration: const BoxDecoration(color: Colors.white),
+            child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
@@ -87,48 +87,48 @@ class _GetEnrolledState extends State<GetEnrolled> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             "Course Time: 8 weeks",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Text(
+          const Text(
             "Course Trainner: Syed Hasnain",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             "Purchase Detail",
             style: TextStyle(
               fontSize: 15,
             ),
           ),
-          Divider(
+          const Divider(
             thickness: 3,
             color: Colors.black,
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [Text("Date : 19/03/2024"), Text(r"Price : 72$")],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [Text("Coupon : 10% Off"), Text(r"Final Price : 65$")],
           ),
-          SizedBox(
+          const SizedBox(
             height: 100,
           ),
           SizedBox(
@@ -137,7 +137,7 @@ class _GetEnrolledState extends State<GetEnrolled> {
             child: MaterialButton(
                 color: Colors.blue[700],
                 onPressed: () {},
-                child: Text(
+                child: const Text(
                   "Continue",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 )),

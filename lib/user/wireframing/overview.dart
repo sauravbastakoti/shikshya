@@ -16,11 +16,11 @@ class _OverviewWireframingState extends State<OverviewWireframing> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Graphics Design",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("by Syed Hasnain"),
@@ -30,19 +30,19 @@ class _OverviewWireframingState extends State<OverviewWireframing> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Text(
+            const Text(
                 "Graphic design is a craft where professionals create visual content to communicate messages. By applying visual hierarchy and page layout techniques, designers use typography and pictures to meet users’ specific needs and focus on the logic of displaying elements in interactive designs to optimize the user experience."),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Container(
               height: 80,
               width: double.infinity,
-              decoration: BoxDecoration(color: Colors.grey),
-              child: Column(
+              decoration: const BoxDecoration(color: Colors.grey),
+              child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
@@ -87,7 +87,7 @@ class _OverviewWireframingState extends State<OverviewWireframing> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 100,
             ),
             SizedBox(
@@ -96,7 +96,7 @@ class _OverviewWireframingState extends State<OverviewWireframing> {
               child: MaterialButton(
                   color: Colors.lightBlue,
                   onPressed: () {},
-                  child: Text(
+                  child: const Text(
                     "Get Enrolled",
                     style: TextStyle(fontSize: 20),
                   )),

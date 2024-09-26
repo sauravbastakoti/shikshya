@@ -10,7 +10,6 @@ import 'package:sikshya/payment/esewa_payment.dart';
 import 'package:sikshya/utils/api_string.dart';
 
 import 'dart:convert';
-import 'package:video_player/video_player.dart'; // Import video_player package
 
 class WebsiteScreen extends StatefulWidget {
   final int id;
@@ -65,7 +64,7 @@ class _WebsiteScreenState extends State<WebsiteScreen>
                 LessonWebsite(
                   id: widget.id,
                 ),
-                const ReviewWebsite(),
+                ReviewWebsite(id: widget.id),
               ],
             ),
           ),
@@ -138,6 +137,7 @@ class _OverviewWebsiteState extends State<OverviewWebsite> {
   Future<void> fetchRecommendedVideos() async {
     const String apiUrl = '${ApiString.baseUrl}recommendations/';
     final token = locator.get<SharedPreferencesService>().token;
+
     log(token.toString());
 
     try {
@@ -166,26 +166,6 @@ class _OverviewWebsiteState extends State<OverviewWebsite> {
       });
     }
   }
-
-  // void openEsewaPayment() async {
-  //   String baseUrl = "https://uat.esewa.com.np/epay/main";
-  //   String totalAmount = "100"; // Total transaction amount
-  //   String productId = "123456789"; // Unique product ID or order ID
-  //   String merchantCode = "EPAYTEST"; // Your eSewa merchant code
-  //   String successUrl =
-  //       "https://yourwebsite.com/success"; // Redirect URL after successful payment
-  //   String failureUrl =
-  //       "https://yourwebsite.com/failure"; // Redirect URL if the payment fails
-
-  //   String paymentUrl =
-  //       "$baseUrl?tAmt=$totalAmount&amt=$totalAmount&txAmt=0&psc=0&pdc=0&scd=$merchantCode&pid=$productId&su=$successUrl&fu=$failureUrl";
-
-  //   if (await canLaunch(paymentUrl)) {
-  //     await launch(paymentUrl);
-  //   } else {
-  //     throw 'Could not launch $paymentUrl';
-  //   }
-  // }
 
   void processPayment() async {
     final eSewaConfig = ESewaConfig.dev(
@@ -415,22 +395,6 @@ class _LessonWebsiteState extends State<LessonWebsite> {
                             ListTile(
                               title: Text(chapter['description']),
                             ),
-                            // ...chapter['videos'].map<Widget>((video) {
-                            //   return ListTile(
-                            //     leading: const Icon(Icons.play_circle),
-                            //     title: Text(video['title']),
-                            //     onTap: () {
-                            //       Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //           builder: (context) => VideoPlayerScreen(
-                            //             videoUrl: video['full_video_url'],
-                            //           ),
-                            //         ),
-                            //       );
-                            //     },
-                            //   );
-                            // }).toList(),
                           ],
                         ),
                         isExpanded: chapter['isExpanded'] ?? false,
@@ -444,112 +408,121 @@ class _LessonWebsiteState extends State<LessonWebsite> {
   }
 }
 
-// class VideoPlayerScreen extends StatefulWidget {
-//   final String videoUrl;
-//   const VideoPlayerScreen({super.key, required this.videoUrl});
+class ReviewWebsite extends StatefulWidget {
+  final int id;
+  const ReviewWebsite({super.key, required this.id});
 
-//   @override
-//   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
-// }
+  @override
+  _ReviewWebsiteState createState() => _ReviewWebsiteState();
+}
 
-// class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-//   late VideoPlayerController _controller;
-//   bool _isPlaying = false;
-//   bool _hasError = false;
+class _ReviewWebsiteState extends State<ReviewWebsite> {
+  List<dynamic> _reviews = [];
+  double _averageRating = 0.0;
+  bool _isLoading = true;
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     loadVideo();
-//   }
+  @override
+  void initState() {
+    super.initState();
+    _fetchReviewsAndRatings();
+  }
 
-//   Future<void> loadVideo() async {
-//     try {
-//       print('Video URL: ${widget.videoUrl}');
+  Future<void> _fetchReviewsAndRatings() async {
+    final token = locator.get<SharedPreferencesService>().token;
+    try {
+      // Fetch reviews (Expecting a List response)
+      final reviewsResponse = await http.get(
+        Uri.parse('http://192.168.1.115:8000/api/reviews/${widget.id}/'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
 
-//       if (widget.videoUrl.isNotEmpty) {
-//         _controller =
-//             VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
-//               ..initialize().then((_) {
-//                 setState(() {
-//                   _hasError =
-//                       false; // Reset error state if initialized successfully
-//                 });
-//                 _controller.play();
-//                 _isPlaying = true;
-//               }).catchError((error) {
-//                 setState(() {
-//                   _hasError =
-//                       true; // Set error state if video initialization fails
-//                 });
-//                 print("Error initializing video: $error");
-//               });
-//       } else {
-//         setState(() {
-//           _hasError = true;
-//         });
-//         print("Invalid video URL");
-//       }
-//     } catch (e) {
-//       setState(() {
-//         _hasError = true;
-//       });
-//       print("Error loading video: $e");
-//     }
-//   }
+      // Decode response as a List
+      final List<dynamic> reviewsData = jsonDecode(reviewsResponse.body);
 
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
+      // Fetch average rating (Expecting a Map response)
+      final ratingResponse = await http.get(
+        Uri.parse('http://192.168.1.115:8000/api/ratings/${widget.id}/'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      final Map<String, dynamic> ratingData = jsonDecode(ratingResponse.body);
+      double averageRating = ratingData['average_rating'] ?? 0.0;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Video Player'),
-//       ),
-//       body: Center(
-//           child: _hasError
-//               ? const Text('Failed to load video') // Show error message
-//               : _controller.value.isInitialized
-//                   ? Column(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//                         AspectRatio(
-//                           aspectRatio: _controller.value.aspectRatio,
-//                           child: VideoPlayer(_controller),
-//                         ),
-//                         const SizedBox(height: 20),
-//                         IconButton(
-//                           icon: Icon(
-//                             _isPlaying ? Icons.pause : Icons.play_arrow,
-//                           ),
-//                           onPressed: () {
-//                             setState(() {
-//                               if (_isPlaying) {
-//                                 _controller.pause();
-//                               } else {
-//                                 _controller.play();
-//                               }
-//                               _isPlaying = !_isPlaying;
-//                             });
-//                           },
-//                         ),
-//                       ],
-//                     )
-//                   : const CircularProgressIndicator()),
-//     );
-//   }
-// }
-
-class ReviewWebsite extends StatelessWidget {
-  const ReviewWebsite({super.key});
+      setState(() {
+        _reviews = reviewsData; // List of reviews
+        _averageRating = averageRating; // Average rating value
+        _isLoading = false;
+      });
+    } catch (e) {
+      // Handle errors
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Reviews"));
+    return Scaffold(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Rate our service:',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildAverageRatingStars(),
+                    const SizedBox(height: 10),
+                    const Divider(),
+                    const Text(
+                      'User Reviews:',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildReviewList(),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildAverageRatingStars() {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < _averageRating ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+        );
+      }),
+    );
+  }
+
+  Widget _buildReviewList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _reviews.length,
+      itemBuilder: (context, index) {
+        final review = _reviews[index];
+        return ListTile(
+          title: Text(review['student_name']),
+          subtitle: Text(review['comment']),
+        );
+      },
+    );
   }
 }
 
