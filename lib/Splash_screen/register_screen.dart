@@ -16,6 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
+  final _username = TextEditingController();
 
   String? _selectedRole; // Add this to store the selected role
   bool _isPasswordHidden = true;
@@ -32,7 +33,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return BlocProvider(
       create: (context) => RegisterCubit(locator.get<ApiService>()),
       child: BlocListener<RegisterCubit, RegisterState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state.status == RegisterStatus.successful) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Login successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state.status == RegisterStatus.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage ?? 'Login failed'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
         child: Scaffold(
           body: SingleChildScrollView(
             child: Column(
@@ -80,9 +97,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Column(
                           children: [
                             TextFormField(
+                              controller: _username,
                               decoration: const InputDecoration(
-                                labelText: "Enter your Full Name",
-                                hintText: "Full Name",
+                                labelText: "Enter your  UserName",
+                                hintText: "Username",
                                 border: OutlineInputBorder(),
                               ),
                               validator: (value) {
@@ -209,6 +227,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: ElevatedButton(
                                   onPressed: () {
                                     if (_formKey.currentState!.validate()) {
+                                      context.read<RegisterCubit>().register(
+                                          username: _username.text,
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                          role: 'student',
+                                          phoneNumber: '9831831938131',
+                                          address: 'pokahara');
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(

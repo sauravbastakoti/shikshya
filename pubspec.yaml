@@ -52,6 +52,8 @@ dependencies:
   flutter_pannable_rating_bar: ^2.7.2+1
   chewie: ^1.8.5
   esewa_flutter: ^1.1.2
+  webview_flutter: ^4.9.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

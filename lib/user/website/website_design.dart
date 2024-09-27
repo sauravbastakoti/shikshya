@@ -114,7 +114,7 @@ class _OverviewWebsiteState extends State<OverviewWebsite> {
         log(response.body);
 
         setState(() {
-          _teacher = "Teacher ID: ${data['teacher']}";
+          _teacher = "Teacher ID: ${data['teacher_username']}";
           _title = data['title'];
           _description = data['description'];
           _thumbnailUrl = data['thumbnail_url'] ?? '';
@@ -123,7 +123,6 @@ class _OverviewWebsiteState extends State<OverviewWebsite> {
           _isLoading = false;
         });
       } else {
-        // Handle errors based on status codes
         throw Exception('Failed to load course overview: ${response.body}');
       }
     } catch (error) {
@@ -432,7 +431,7 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
     try {
       // Fetch reviews (Expecting a List response)
       final reviewsResponse = await http.get(
-        Uri.parse('http://192.168.1.115:8000/api/reviews/${widget.id}/'),
+        Uri.parse('${ApiString.baseUrl}reviews/${widget.id}/'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -443,7 +442,7 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
 
       // Fetch average rating (Expecting a Map response)
       final ratingResponse = await http.get(
-        Uri.parse('http://192.168.1.115:8000/api/ratings/${widget.id}/'),
+        Uri.parse('${ApiString.baseUrl}ratings/${widget.id}/'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -461,7 +460,7 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
       setState(() {
         _isLoading = false;
       });
-      print('Error fetching data: $e');
+      print('Error fetching data: ');
     }
   }
 
@@ -477,7 +476,7 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Rate our service:',
+                      'Ratings :',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),

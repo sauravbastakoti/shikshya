@@ -471,14 +471,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     loadVideo();
   }
 
+//https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4
   Future<void> loadVideo() async {
     try {
       print('Video URL: ${widget.videoUrl}');
 
       if (widget.videoUrl.isNotEmpty) {
-        _controller = VideoPlayerController.networkUrl(Uri.parse(
-            'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'))
-          ..initialize().then((_) {
+        _controller = VideoPlayerController.networkUrl(
+          Uri.parse(widget.videoUrl),
+        )..initialize().then((_) {
             setState(() {
               _hasError =
                   false; // Reset error state if initialized successfully
@@ -564,44 +565,31 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
   double _averageRating = 0.0;
   bool _isLoading = true;
 
+  double _currentRating = 0;
+  final TextEditingController _commentController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _fetchReviewsAndRatings();
   }
 
-  double _currentRating = 0;
-  final TextEditingController _commentController = TextEditingController();
-
-  void _submitReview() {
-    if (_currentRating > 0 && _commentController.text.isNotEmpty) {
-      setState(() {
-        _reviews.add({
-          'name': 'Anonymous', // Static user name for demo purposes
-          'rating': _currentRating,
-          'comment': _commentController.text,
-        });
-        _currentRating = 0;
-        _commentController.clear();
-      });
-    }
-  }
-
+  // Fetch reviews and ratings from the server
   Future<void> _fetchReviewsAndRatings() async {
-    final token = locator.get<SharedPreferencesService>().token;
+    final token = locator
+        .get<SharedPreferencesService>()
+        .token; // Assuming token from some service
     try {
-      // Fetch reviews (Expecting a List response)
+      // Fetch reviews
       final reviewsResponse = await http.get(
         Uri.parse('${ApiString.baseUrl}reviews/${widget.id}/'),
         headers: {
           'Authorization': 'Bearer $token',
         },
       );
-
-      // Decode response as a List
       final List<dynamic> reviewsData = jsonDecode(reviewsResponse.body);
 
-      // Fetch average rating (Expecting a Map response)
+      // Fetch average rating
       final ratingResponse = await http.get(
         Uri.parse('${ApiString.baseUrl}ratings/${widget.id}/'),
         headers: {
@@ -612,16 +600,66 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
       double averageRating = ratingData['average_rating'] ?? 0.0;
 
       setState(() {
-        _reviews = reviewsData; // List of reviews
-        _averageRating = averageRating; // Average rating value
+        _reviews = reviewsData;
+        _averageRating = averageRating;
         _isLoading = false;
       });
     } catch (e) {
-      // Handle errors
       setState(() {
         _isLoading = false;
       });
       print('Error fetching data: $e');
+    }
+  }
+
+  // Submit the review and rating
+  Future<void> _submitReview() async {
+    if (_currentRating > 0 && _commentController.text.isNotEmpty) {
+      final token = locator.get<SharedPreferencesService>().token;
+
+      try {
+        // Submit the rating
+        await http.post(
+          Uri.parse('${ApiString.baseUrl}ratings/${widget.id}/'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'ratings': _currentRating,
+          }),
+        );
+
+        // Submit the comment
+        await http.post(
+          Uri.parse('${ApiString.baseUrl}reviews/${widget.id}/'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'comments': _commentController.text,
+          }),
+        );
+
+        setState(() {
+          // Add the new review to the list locally after submission
+          _reviews.add({
+            'name': 'Anonymous', // Static user name for demo purposes
+            'rating': _currentRating,
+            'comment': _commentController.text,
+          });
+
+          // Clear the input fields
+          _currentRating = 0;
+          _commentController.clear();
+        });
+
+        // Optionally re-fetch reviews and average rating from the server
+        _fetchReviewsAndRatings();
+      } catch (e) {
+        print('Error submitting review: $e');
+      }
     }
   }
 
@@ -713,7 +751,7 @@ class _ReviewWebsiteState extends State<ReviewWebsite> {
       itemBuilder: (context, index) {
         final review = _reviews[index];
         return ListTile(
-          title: Text(review['student_name']),
+          title: Text(review['name'] ?? 'Anonymous'),
           subtitle: Text(review['comment']),
         );
       },
